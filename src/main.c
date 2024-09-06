@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
 	FILE *sabertooth;
 
 	// to store sbus packets
-	uint8_t sbus_packet[15];
+	uint8_t sbus_packet[25];
 
 	// to store value of indiviual RC channel
 	uint16_t *channel;
@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 	sabertooth = open_file(port_name_2, "w+");
 	
 	// read data from RC transmitter using sbus
-	read_SBUS(sbus_packet, uint8_t, 25, sbus);
+	read_SBUS(sbus_packet, sizeof(uint8_t), 25, sbus);
 
 	// parsing sbus packet
 	channel = parse_buffer(sbus_packet);

@@ -1,6 +1,63 @@
 # R-25 Test
 
-<p align="center">
+How my code works():
+1.in the parsing.c folder
+  ---i have defined the input min max and output min max;
+  ---Define the neutral point
+  ---Mapped the channel value to a PWM value between OUTPUT_MIN and OUTPUT_MAX
+  ---If channel value is less than neutral, calculate the PWM for backward direction
+  ---If channel value is greater than neutral, calculate the PWM for forward direction
+  ---If channel value is neutral, set PWM to neutral value
+  ---Ensure PWM value is within the valid range
+ 
+2.---in main function in ( this functiion present in  serial "void read_SBUS(uint8_t* buffer, size_t size, size_t n, FILE* file_ptr)")
+  the sytax is wrong and has been change to "read_SBUS(sbus_packet, sizeof(uint8_t), 25, sbus)" ;previously size of was not mentioned;
+
+3.output {--------------------------------------------
+Checking...
+Test-1: 
+./main.exe test/sbus_data\[1\] test/sab_data[1]
+diff test/sab_data[1] test/expected[1]
+--- test/sab_data[1]
++++ test/expected[1]
+@@ -1 +1 @@
+-21
+\ No newline at end of file
++11
+\ No newline at end of file
+make: *** [makefile:13: check] Error 1}
+
+ways to fix 
+----> adjust function for desired output 
+---->Make sure there are no off-by-one errors in the calculation, especially if the input values or ranges are off by 1 or have been misinterpreted.
+---->Debug with Known Values
+---->Check for Negative Values
+---->Ensure Proper Formatting in Output
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.<p align="center">
   <img src="https://github.com/teamrudra/r25-test/blob/main/datasheets/rover.jpeg" width="600" height="300"/>
 
 #### Some Instructions
