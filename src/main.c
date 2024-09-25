@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 	pwm = interpolation(channel[0]);		//  write								
 							//  to
 	// write data to Sabertooth 1			//  sabertooth	
-	write_to_SB(sabertooth, "%d", pwm);		
+	write_to_SB(sabertooth, "%d\n", pwm);		
 
 	// closing all serial port 
 	close_file(sbus);
