@@ -1,42 +1,46 @@
 #include <stdint.h>
-#include "parsing.h"
+#include "parsing.h"  
 #include <math.h>
 
-int interpolation(uint16_t channel) {
-    int min_sbus = 0;    // Minimum SBUS value for motor control
-    int max_sbus = 2407;  // Maximum SBUS value for motor control
-    int min_pwm = 1;  // Corresponding PWM value for full reverse
-    int max_pwm = 127;  // Corresponding PWM value for full forward
-    
-    int pwm = round(1 + (channel- 0) * (127 - 1) / (2047 - 0));
-    return pwm;
+int interpolation(uint16_t sbus_channel) {
+    const int SBUS_MIN = 0;
+    const int SBUS_MAX = 2407;
+    const int PWM_MIN = 1;
+    const int PWM_MAX = 127;
+
+    // Linear interpolation formula to convert SBUS to PWM
+    int pwm_value = round(PWM_MIN + (sbus_channel - SBUS_MIN) * 
+                (PWM_MAX - PWM_MIN) / (2047 - SBUS_MIN));
+
+    return pwm_value;
 }
 
+uint16_t *parse_buffer(uint8_t buff[]) {
+    static uint16_t channels[16]; // Array to hold extracted channel values
+    uint16_t bitmask = 0x07FF;    // Mask to extract 11-bit values
 
-uint16_t *parse_buffer(uint8_t buff[]) { 
-    // to store channels
-    static uint16_t channel[16];
+    // Extracting each 11-bit channel value from the SBUS data buffer
+    channels[0]  = (buff[1] | (buff[2] << 8)) & bitmask;
+    channels[1]  = ((buff[2] >> 3) | (buff[3] << 5)) & bitmask;
+    channels[2]  = ((buff[3] >> 6) | (buff[4] << 2) | 
+                    (buff[5] << 10)) & bitmask;
+    channels[3]  = ((buff[5] >> 1) | (buff[6] << 7)) & bitmask;
+    channels[4]  = ((buff[6] >> 4) | (buff[7] << 4)) & bitmask;
+    channels[5]  = ((buff[7] >> 7) | (buff[8] << 1) | 
+                    (buff[9] << 9)) & bitmask;
+    channels[6]  = ((buff[9] >> 2) | (buff[10] << 6)) & bitmask;
+    channels[7]  = ((buff[10] >> 5) | (buff[11] << 3)) & bitmask;
+    channels[8]  = (buff[12] | (buff[13] << 8)) & bitmask;
+    channels[9]  = ((buff[13] >> 3) | (buff[14] << 5)) & bitmask;
+    channels[10] = ((buff[14] >> 6) | (buff[15] << 2) | 
+                    (buff[16] << 10)) & bitmask;
+    channels[11] = ((buff[16] >> 1) | (buff[17] << 7)) & bitmask;
+    channels[12] = ((buff[17] >> 4) | (buff[18] << 4)) & bitmask;
+    channels[13] = ((buff[18] >> 7) | (buff[19] << 1) | 
+                    (buff[20] << 9)) & bitmask;
+    channels[14] = ((buff[20] >> 2) | (buff[21] << 6)) & bitmask;
+    channels[15] = ((buff[21] >> 5) | (buff[22] << 3)) & bitmask;
 
-    // masking byte shiftings bits (value in hexa '0x07FF')
-    uint16_t mask = 0x7ff;
-
-    // creating channels 
-    channel[0]  = ((buff[1] | buff[2] << 8)                 & mask);
-    channel[1]  = ((buff[2] >> 3 | buff[3] << 5)              & mask);
-    channel[2]  = ((buff[3] >> 6 | buff[4] << 2 | buff[5] << 10) & mask);
-    channel[3]  = ((buff[5] >> 1 | buff[6] << 7)              & mask);
-    channel[4]  = ((buff[6] >> 4 | buff[7] << 4)              & mask);
-    channel[5]  = ((buff[7] >> 7 | buff[8] << 1 | buff[9] << 9)  & mask);
-    channel[6]  = ((buff[9] >> 2 | buff[10] << 6)             & mask);
-    channel[7]  = ((buff[10] >> 5 | buff[11] << 3)             & mask);
-    channel[8]  = ((buff[12]   | buff[13] << 8)             & mask);
-    channel[9]  = ((buff[13] >> 3 | buff[14] << 5)             & mask);
-    channel[10] = ((buff[14] >> 6 | buff[15] << 2 | buff[16] << 10) & mask);
-    channel[11] = ((buff[16] >> 1 | buff[17] << 7)             & mask);
-    channel[12] = ((buff[17] >> 4 | buff[18] << 4)             & mask);
-    channel[13] = ((buff[18] >> 7 | buff[19] << 1 | buff[20] << 9) & mask);
-    channel[14] = ((buff[20] >> 2 | buff[21] << 6)             & mask);
-    channel[15] = ((buff[21] >> 5 | buff[22] << 3)             & mask);
-
-    return channel;
+    return channels;
 }
+
